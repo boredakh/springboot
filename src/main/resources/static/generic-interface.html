@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post API Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            white-space: pre-wrap; /* Preserve formatting for JSON */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Post API Interface</h1>
+
+        <!-- Form to Create a Post -->
+        <h2>Create Post</h2>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="Enter email">
+        </div>
+        <div class="form-group">
+            <label for="passcode">Passcode:</label>
+            <input type="number" id="passcode" placeholder="Enter passcode">
+        </div>
+        <div class="form-group">
+            <label for="active">Active:</label>
+            <select id="active">
+                <option value="true">True</option>
+                <option value="false">False</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="icRating">IC Rating:</label>
+            <select id="icRating">
+                <option value="true">True</option>
+                <option value="false">False</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="hjRating">HJ Rating:</label>
+            <input type="number" step="0.1" id="hjRating" placeholder="Enter HJ Rating">
+        </div>
+        <button onclick="createPost()">Create Post</button>
+
+        <!-- Form to Fetch All Posts -->
+        <h2>Fetch All Posts</h2>
+        <button onclick="fetchAllPosts()">Fetch All Posts</button>
+
+        <!-- Form to Fetch a Post by ID -->
+        <h2>Fetch Post by ID</h2>
+        <div class="form-group">
+            <label for="fetchId">Post ID:</label>
+            <input type="number" id="fetchId" placeholder="Enter Post ID">
+        </div>
+        <button onclick="fetchPostById()">Fetch Post</button>
+
+        <!-- Form to Fetch Posts by IC Rating -->
+        <h2>Fetch Posts by IC Rating</h2>
+        <div class="form-group">
+            <label for="fetchIcRating">IC Rating:</label>
+            <select id="fetchIcRating">
+                <option value="true">True</option>
+                <option value="false">False</option>
+            </select>
+        </div>
+        <button onclick="fetchPostsByIcRating()">Fetch Posts</button>
+
+        <!-- Form to Update a Post -->
+        <h2>Update Post</h2>
+        <div class="form-group">
+            <label for="updateId">Post ID:</label>
+            <input type="number" id="updateId" placeholder="Enter Post ID">
+        </div>
+        <div class="form-group">
+            <label for="updateEmail">Email:</label>
+            <input type="email" id="updateEmail" placeholder="Enter email">
+        </div>
+        <div class="form-group">
+            <label for="updatePasscode">Passcode:</label>
+            <input type="number" id="updatePasscode" placeholder="Enter passcode">
+        </div>
+        <div class="form-group">
+            <label for="updateActive">Active:</label>
+            <select id="updateActive">
+                <option value="true">True</option>
+                <option value="false">False</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="updateIcRating">IC Rating:</label>
+            <select id="updateIcRating">
+                <option value="true">True</option>
+                <option value="false">False</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="updateHjRating">HJ Rating:</label>
+            <input type="number" step="0.1" id="updateHjRating" placeholder="Enter HJ Rating">
+        </div>
+        <button onclick="updatePost()">Update Post</button>
+
+        <!-- Form to Delete a Post -->
+        <h2>Delete Post</h2>
+        <div class="form-group">
+            <label for="deleteId">Post ID:</label>
+            <input type="number" id="deleteId" placeholder="Enter Post ID">
+        </div>
+        <button onclick="deletePost()">Delete Post</button>
+
+        <!-- Display API Response -->
+        <h2>API Response</h2>
+        <div class="response" id="response"></div>
+    </div>
+
+    <script>
+        // Function to send a POST request to create a post
+        function createPost() {
+            const email = document.getElementById('email').value;
+            const passcode = document.getElementById('passcode').value;
+            const active = document.getElementById('active').value === 'true';
+            const icRating = document.getElementById('icRating').value === 'true';
+            const hjRating = parseFloat(document.getElementById('hjRating').value);
+
+            const postData = {
+                email: email,
+                passcode: parseInt(passcode),
+                active: active,
+                icRating: icRating,
+                hjRating: hjRating
+            };
+
+            fetch('http://localhost:8080/posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                document.getElementById('response').innerText = 'Error: ' + error.message;
+            });
+        }
+
+        // Function to fetch all posts
+        function fetchAllPosts() {
+            fetch('http://localhost:8080/posts')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('response').innerText = 'Error: ' + error.message;
+                });
+        }
+
+        // Function to fetch a post by ID
+        function fetchPostById() {
+            const postId = document.getElementById('fetchId').value;
+            fetch(`http://localhost:8080/posts/${postId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Post not found');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('response').innerText = 'Error: ' + error.message;
+                });
+        }
+
+        // Function to fetch posts by IC Rating
+        function fetchPostsByIcRating() {
+            const icRating = document.getElementById('fetchIcRating').value === 'true';
+            fetch(`http://localhost:8080/posts/icRating/${icRating}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch posts');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('response').innerText = 'Error: ' + error.message;
+                });
+        }
+
+        // Function to update a post by ID
+        function updatePost() {
+            const postId = document.getElementById('updateId').value;
+            const email = document.getElementById('updateEmail').value;
+            const passcode = document.getElementById('updatePasscode').value;
+            const active = document.getElementById('updateActive').value === 'true';
+            const icRating = document.getElementById('updateIcRating').value === 'true';
+            const hjRating = parseFloat(document.getElementById('updateHjRating').value);
+
+            const postData = {
+                email: email,
+                passcode: parseInt(passcode),
+                active: active,
+                icRating: icRating,
+                hjRating: hjRating
+            };
+
+            fetch(`http://localhost:8080/posts/${postId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                document.getElementById('response').innerText = 'Error: ' + error.message;
+            });
+        }
+
+        // Function to delete a post by ID
+        function deletePost() {
+            const postId = document.getElementById('deleteId').value;
+            fetch(`http://localhost:8080/posts/${postId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('response').innerText = 'Post deleted successfully';
+                } else {
+                    throw new Error('Failed to delete post');
+                }
+            })
+            .catch(error => {
+                document.getElementById('response').innerText = 'Error: ' + error.message;
+            });
+        }
+    </script>
+</body>
+</html>
